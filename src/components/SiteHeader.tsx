@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import SearchOverlay from "./SearchOverlay";
 
 const SiteHeader = () => {
   const [sticky, setSticky] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { openCart, totalItems } = useCart();
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const SiteHeader = () => {
 
         {/* Right icons */}
         <div className="flex items-center gap-2 ml-auto md:ml-0">
-          <button className="hidden sm:inline-flex p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Search">
+          <button onClick={() => setSearchOpen(true)} className="hidden sm:inline-flex p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Search">
             <Search className="w-5 h-5" />
           </button>
           <button
@@ -87,6 +89,8 @@ const SiteHeader = () => {
           </ul>
         </nav>
       )}
+
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 };
