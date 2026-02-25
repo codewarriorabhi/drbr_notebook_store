@@ -1,14 +1,25 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import SiteHeader from "@/components/SiteHeader";
+import HeroBanner from "@/components/HeroBanner";
+import CategoriesSection from "@/components/CategoriesSection";
+import FeaturedSlider from "@/components/FeaturedSlider";
+import ShopSection from "@/components/ShopSection";
+import NewsletterSection from "@/components/NewsletterSection";
+import SiteFooter from "@/components/SiteFooter";
+import CartDrawer from "@/components/CartDrawer";
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
-};
+const Index = () => (
+  <div className="min-h-screen">
+    <SiteHeader />
+    <main>
+      <HeroBanner />
+      <CategoriesSection />
+      <FeaturedSlider />
+      <ShopSection />
+      <NewsletterSection />
+    </main>
+    <SiteFooter />
+    <CartDrawer />
+  </div>
+);
 
 export default Index;
