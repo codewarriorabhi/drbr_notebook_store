@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import SearchOverlay from "./SearchOverlay";
 import ContactDialog from "./ContactDialog";
 import AboutDialog from "./AboutDialog";
+import logo from "@/assets/logo.png";
 
 const SiteHeader = () => {
   const [sticky, setSticky] = useState(false);
@@ -28,8 +29,8 @@ const SiteHeader = () => {
         }`}
       >
         {/* Logo */}
-        <a href="#" className="text-primary font-bold text-lg tracking-tight whitespace-nowrap">
-          Dr. Br. Notebook Store
+        <a href="#" className="flex items-center">
+          <img src={logo} alt="Dr. Br. Notebook Store" className="h-10 w-auto" />
         </a>
 
         {/* Desktop nav */}
