@@ -3,12 +3,14 @@ import { Search, ShoppingCart, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import SearchOverlay from "./SearchOverlay";
 import ContactDialog from "./ContactDialog";
+import AboutDialog from "./AboutDialog";
 
 const SiteHeader = () => {
   const [sticky, setSticky] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const { openCart, totalItems } = useCart();
 
   useEffect(() => {
@@ -36,8 +38,8 @@ const SiteHeader = () => {
             {["Home", "Shop", "About", "Contact"].map(link => (
               <li key={link}>
                 <a
-                  href={link === "Contact" ? undefined : `#${link.toLowerCase()}`}
-                  onClick={link === "Contact" ? (e) => { e.preventDefault(); setContactOpen(true); } : undefined}
+                  href={link === "Contact" || link === "About" ? undefined : `#${link.toLowerCase()}`}
+                  onClick={link === "Contact" ? (e) => { e.preventDefault(); setContactOpen(true); } : link === "About" ? (e) => { e.preventDefault(); setAboutOpen(true); } : undefined}
                   className="px-3 py-2 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                 >
                   {link}
@@ -81,9 +83,9 @@ const SiteHeader = () => {
             {["Home", "Shop", "About", "Contact"].map(link => (
               <li key={link}>
                 <a
-                  href={link === "Contact" ? undefined : `#${link.toLowerCase()}`}
+                  href={link === "Contact" || link === "About" ? undefined : `#${link.toLowerCase()}`}
                   className="block px-3 py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  onClick={() => { if (link === "Contact") { setContactOpen(true); } setMobileOpen(false); }}
+                  onClick={() => { if (link === "Contact") { setContactOpen(true); } if (link === "About") { setAboutOpen(true); } setMobileOpen(false); }}
                 >
                   {link}
                 </a>
@@ -95,6 +97,7 @@ const SiteHeader = () => {
 
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
       <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
+      <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </header>
   );
 };
