@@ -29,12 +29,16 @@ const SiteHeader = () => {
         }`}
       >
         {/* Logo */}
-        <a href="#" className="flex flex-col items-start leading-none group">
-          <span className="text-[10px] font-extrabold tracking-[0.15em] text-primary uppercase">Dr. Br.</span>
-          <span className="text-primary font-black text-base tracking-tight uppercase logo-typewriter">
+        <a href="#" className="flex flex-col items-start leading-none group logo-container">
+          <span className="logo-line logo-line-1 text-[10px] font-extrabold tracking-[0.2em] text-primary uppercase">
+            Dr. Br.
+          </span>
+          <span className="logo-line logo-line-2 text-primary font-black text-lg tracking-tight uppercase logo-typewriter">
             NoteBook
           </span>
-          <span className="text-[8px] font-semibold tracking-[0.35em] text-primary/70 uppercase">Store</span>
+          <span className="logo-line logo-line-3 text-[9px] font-semibold tracking-[0.4em] text-primary/70 uppercase">
+            Store
+          </span>
         </a>
 
         {/* Desktop nav */}
