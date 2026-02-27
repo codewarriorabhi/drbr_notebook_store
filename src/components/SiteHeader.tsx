@@ -38,7 +38,7 @@ const SiteHeader = () => {
             {["Home", "Shop", "About", "Contact"].map(link => (
               <li key={link}>
                 <a
-                  href={link === "Contact" || link === "About" ? undefined : `#${link.toLowerCase()}`}
+                  href={link === "Contact" || link === "About" ? undefined : link === "Home" ? "#categories" : `#${link.toLowerCase()}`}
                   onClick={link === "Contact" ? (e) => { e.preventDefault(); setContactOpen(true); } : link === "About" ? (e) => { e.preventDefault(); setAboutOpen(true); } : undefined}
                   className="px-3 py-2 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                 >
@@ -83,7 +83,7 @@ const SiteHeader = () => {
             {["Home", "Shop", "About", "Contact"].map(link => (
               <li key={link}>
                 <a
-                  href={link === "Contact" || link === "About" ? undefined : `#${link.toLowerCase()}`}
+                  href={link === "Contact" || link === "About" ? undefined : link === "Home" ? "#categories" : `#${link.toLowerCase()}`}
                   className="block px-3 py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                   onClick={() => { if (link === "Contact") { setContactOpen(true); } if (link === "About") { setAboutOpen(true); } setMobileOpen(false); }}
                 >
