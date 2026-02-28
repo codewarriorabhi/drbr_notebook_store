@@ -35,7 +35,7 @@ const SiteFooter = () => (
       </div>
     </div>
     <div className="section-max-width mt-5 pt-3.5 border-t border-border/50">
-      <small className="text-xs text-muted-foreground">© 2026 Sri Rama Notebook — All rights reserved.</small>
+      <small className="text-xs text-muted-foreground">© 2026 Dr. Br. NoteBook Store — All rights reserved.</small>
     </div>
   </footer>
 );
