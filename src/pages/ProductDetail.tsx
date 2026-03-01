@@ -1,16 +1,21 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { allProducts } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { useOrder } from "@/context/OrderContext";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CartDrawer from "@/components/CartDrawer";
-import { ArrowLeft, Minus, Plus, ShoppingCart, Package, CheckCircle, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Minus, Plus, ShoppingCart, Package, CheckCircle, AlertTriangle, Zap } from "lucide-react";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const product = allProducts.find((p) => p.id === id);
   const { addItem } = useCart();
+  const { isAuthenticated } = useAuth();
+  const { setPendingProduct } = useOrder();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
 
   if (!product) {
@@ -164,6 +169,32 @@ const ProductDetail = () => {
                   Add to Cart
                 </button>
               </div>
+            )}
+
+            {/* Order Now */}
+            {inStock && (
+              <button
+                onClick={() => {
+                  setPendingProduct({
+                    product_id: product.id,
+                    product_name: product.title,
+                    price: product.price,
+                    selected_quantity: quantity,
+                    selected_color: product.color,
+                    selected_size: product.size,
+                    product_image: product.image,
+                  });
+                  if (!isAuthenticated) {
+                    navigate("/login", { state: { from: "/checkout" } });
+                  } else {
+                    navigate("/checkout");
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-accent text-accent-foreground font-extrabold text-sm transition-all hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
+              >
+                <Zap className="w-4 h-4" />
+                Order Now
+              </button>
             )}
           </div>
         </div>
