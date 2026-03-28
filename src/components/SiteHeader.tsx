@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, Menu, X , Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import SearchOverlay from "./SearchOverlay";
 import ContactDialog from "./ContactDialog";
@@ -60,6 +61,13 @@ const SiteHeader = () => {
 
         {/* Right icons */}
         <div className="flex items-center gap-2 ml-auto md:ml-0">
+          <Link
+            to="/login"
+            className="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-secondary to-muted border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/50 hover:shadow-[0_0_15px_hsl(160_52%_62%/0.3)] transition-all duration-300"
+            aria-label="Login"
+          >
+            <Lock className="w-4 h-4" />
+          </Link>
           <button onClick={() => setSearchOpen(true)} className="hidden sm:inline-flex p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" aria-label="Search">
             <Search className="w-5 h-5" />
           </button>
@@ -100,6 +108,16 @@ const SiteHeader = () => {
                 </a>
               </li>
             ))}
+            <li className="border-t border-border/50 mt-2 pt-2">
+              <Link
+                to="/login"
+                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-primary hover:bg-muted transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Lock className="w-4 h-4" />
+                Login
+              </Link>
+            </li>
           </ul>
         </nav>
       )}

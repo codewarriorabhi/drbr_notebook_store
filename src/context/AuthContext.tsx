@@ -1,70 +1,101 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { sendOTP, verifyOTP } from "@/services/authService";
 
 export interface User {
-  id: string;
   email: string;
-  name: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  isLoading: boolean;
+  error: string | null;
+  sendOTPCode: (email: string) => Promise<boolean>;
+  verifyOTPCode: (email: string, otp: string) => Promise<boolean>;
   logout: () => void;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USERS_KEY = "drb_users";
 const SESSION_KEY = "drb_session";
+const TOKEN_KEY = "drb_token";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     const saved = localStorage.getItem(SESSION_KEY);
     return saved ? JSON.parse(saved) : null;
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) localStorage.setItem(SESSION_KEY, JSON.stringify(user));
     else localStorage.removeItem(SESSION_KEY);
   }, [user]);
 
-  const getUsers = (): Array<{ id: string; email: string; name: string; password: string }> => {
-    const raw = localStorage.getItem(USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  };
-
-  const login = useCallback(async (email: string, password: string) => {
-    const users = getUsers();
-    const found = users.find(u => u.email === email && u.password === password);
-    if (found) {
-      setUser({ id: found.id, email: found.email, name: found.name });
+  const sendOTPCode = useCallback(async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await sendOTP(email);
       return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send OTP");
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    return false;
   }, []);
 
-  const register = useCallback(async (name: string, email: string, password: string) => {
-    const users = getUsers();
-    if (users.find(u => u.email === email)) return false;
-    const newUser = { id: crypto.randomUUID(), email, name, password };
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, newUser]));
-    setUser({ id: newUser.id, email: newUser.email, name: newUser.name });
-    return true;
+  const verifyOTPCode = useCallback(async (email: string, otp: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await verifyOTP(email, otp);
+      setUser(response.user);
+      localStorage.setItem(TOKEN_KEY, response.token);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to verify OTP");
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const logout = useCallback(() => setUser(null), []);
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        error,
+        sendOTPCode,
+        verifyOTPCode,
+        logout,
+        clearError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
