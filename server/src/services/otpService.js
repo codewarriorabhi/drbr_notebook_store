@@ -1,71 +1,59 @@
-import crypto from 'crypto';
-import db from '../models/database.js';
+const crypto = require('crypto');
+const db = require('../models/database');
 
 const OTP_EXPIRY_MINUTES = parseInt(process.env.OTP_EXPIRY_MINUTES) || 5;
 const MAX_OTP_REQUESTS = parseInt(process.env.MAX_OTP_REQUESTS) || 3;
 const RATE_LIMIT_WINDOW_MINUTES = parseInt(process.env.RATE_LIMIT_WINDOW_MINUTES) || 10;
 
-export const generateOTP = () => {
+const generateOTP = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-export const hashOTP = (otp) => {
+const hashOTP = (otp) => {
   return crypto.createHash('sha256').update(otp).digest('hex');
 };
 
-export const checkRateLimit = (email) => {
+const checkRateLimit = (email) => {
   const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000);
   
-  const existingRequest = db.prepare(
-    'SELECT * FROM otp_requests WHERE email = ? AND window_start > ?'
-  ).get(email, windowStart.toISOString());
+  const existingRequest = db.getOTPRequest(email);
 
-  if (existingRequest) {
-    if (existingRequest.request_count >= MAX_OTP_REQUESTS) {
+  if (existingRequest && new Date(existingRequest.windowStart) > windowStart) {
+    if (existingRequest.requestCount >= MAX_OTP_REQUESTS) {
       return { allowed: false, message: 'Too many requests. Please try again later.' };
     }
     
-    db.prepare(
-      'UPDATE otp_requests SET request_count = request_count + 1 WHERE email = ?'
-    ).run(email);
+    db.incrementOTPRequest(email);
     
-    return { allowed: true, remaining: MAX_OTP_REQUESTS - existingRequest.request_count - 1 };
+    return { allowed: true, remaining: MAX_OTP_REQUESTS - existingRequest.requestCount - 1 };
   }
 
-  db.prepare(
-    'INSERT OR REPLACE INTO otp_requests (email, request_count, window_start) VALUES (?, 1, CURRENT_TIMESTAMP)'
-  ).run(email);
+  db.setOTPRequest(email, { requestCount: 1, windowStart: new Date() });
 
   return { allowed: true, remaining: MAX_OTP_REQUESTS - 1 };
 };
 
-export const storeOTP = (email, otp) => {
+const storeOTP = (email, otp) => {
   const otpHash = hashOTP(otp);
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
-  db.prepare(
-    'DELETE FROM otp_verifications WHERE email = ?'
-  ).run(email);
+  db.deleteOTPVerification(email);
 
-  const result = db.prepare(
-    'INSERT INTO otp_verifications (email, otp_hash, expires_at) VALUES (?, ?, ?)'
-  ).run(email, otpHash, expiresAt.toISOString());
+  const id = db.createOTPVerification(email, otpHash, expiresAt);
 
-  return result.lastInsertRowid;
+  return id;
 };
 
-export const verifyOTP = (email, otp) => {
+const verifyOTP = (email, otp) => {
   const otpHash = hashOTP(otp);
   
-  const record = db.prepare(
-    'SELECT * FROM otp_verifications WHERE email = ? AND otp_hash = ? AND verified = 0'
-  ).get(email, otpHash);
+  const record = db.getOTPVerification(email);
 
-  if (!record) {
+  if (!record || record.otpHash !== otpHash || record.verified) {
     return { valid: false, message: 'Invalid OTP' };
   }
 
-  if (new Date(record.expires_at) < new Date()) {
+  if (new Date(record.expiresAt) < new Date()) {
     return { valid: false, message: 'OTP has expired' };
   }
 
@@ -73,16 +61,22 @@ export const verifyOTP = (email, otp) => {
     return { valid: false, message: 'Too many attempts. Please request a new OTP.' };
   }
 
-  db.prepare(
-    'UPDATE otp_verifications SET verified = 1 WHERE id = ?'
-  ).run(record.id);
+  db.updateOTPVerification(email, { verified: true });
 
   return { valid: true, message: 'OTP verified successfully' };
 };
 
-export const incrementAttempts = (email, otp) => {
-  const otpHash = hashOTP(otp);
-  db.prepare(
-    'UPDATE otp_verifications SET attempts = attempts + 1 WHERE email = ? AND otp_hash = ?'
-  ).run(email, otpHash);
+const incrementAttempts = (email, otp) => {
+  const record = db.getOTPVerification(email);
+  if (record) {
+    db.updateOTPVerification(email, { attempts: record.attempts + 1 });
+  }
+};
+
+module.exports = {
+  generateOTP,
+  storeOTP,
+  verifyOTP,
+  checkRateLimit,
+  incrementAttempts
 };

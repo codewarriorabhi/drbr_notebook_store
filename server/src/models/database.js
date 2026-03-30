@@ -50,4 +50,4 @@ class InMemoryDB {
   }
 }
 
-export default new InMemoryDB();
+module.exports = new InMemoryDB();

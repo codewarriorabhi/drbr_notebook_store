@@ -1,13 +1,13 @@
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import { sendOTPEmail } from '../services/emailService.js';
-import { 
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const transporter = require('../services/emailService');
+const { 
   generateOTP, 
   storeOTP, 
   verifyOTP, 
   checkRateLimit,
   incrementAttempts 
-} from '../services/otpService.js';
+} = require('../services/otpService');
 
 const router = express.Router();
 
@@ -33,11 +33,25 @@ router.post('/send-otp', apiLimiter, async (req, res) => {
     const otp = generateOTP();
     storeOTP(email, otp);
 
-    const emailResult = await sendOTPEmail(email, otp);
-    
-    if (!emailResult.success) {
-      return res.status(500).json({ error: 'Failed to send email' });
-    }
+    // Send email
+    const mailOptions = {
+      from: `"Notebook Store" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your OTP Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; background: #f9f9f9; border-radius: 8px;">
+          <h2 style="color: #333; text-align: center;">Verification Code</h2>
+          <p style="color: #666; text-align: center;">Your verification code is:</p>
+          <div style="background: #fff; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; color: #2dd4bf; letter-spacing: 8px;">${otp}</span>
+          </div>
+          <p style="color: #999; text-align: center; font-size: 12px;">This code expires in 5 minutes.</p>
+          <p style="color: #999; text-align: center; font-size: 12px;">If you didn't request this code, please ignore this email.</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res.json({ 
       message: 'OTP sent successfully',
@@ -81,4 +95,4 @@ router.post('/verify-otp', apiLimiter, async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

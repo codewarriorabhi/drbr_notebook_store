@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   service: "gmail", // ✅ easiest
   auth: {
     user: process.env.EMAIL_USER,
