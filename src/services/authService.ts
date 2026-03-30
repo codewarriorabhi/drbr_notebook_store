@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export interface SendOTPResponse {
   message: string;
@@ -38,7 +38,7 @@ async function safeJsonParse(response: Response) {
 export const sendOTP = async (email: string): Promise<SendOTPResponse> => {
   console.log('Sending OTP request for:', email);
   
-  const response = await fetch(`${API_URL}/send-otp`, {
+  const response = await fetch(`${API_URL}/api/send-otp`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export const sendOTP = async (email: string): Promise<SendOTPResponse> => {
 export const verifyOTP = async (email: string, otp: string): Promise<VerifyOTPResponse> => {
   console.log('Verifying OTP for:', email);
   
-  const response = await fetch(`${API_URL}/verify-otp`, {
+  const response = await fetch(`${API_URL}/api/verify-otp`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
