@@ -95,13 +95,13 @@ const SiteHeader = () => {
 
       {/* Mobile nav */}
       {mobileOpen && (
-        <nav className="md:hidden mx-3 mt-1 glass-surface rounded-xl p-3 shadow-lg animate-fade-in" aria-label="Mobile">
+        <nav className="md:hidden mx-3 mt-1 glass-surface rounded-xl p-2 sm:p-3 shadow-lg animate-fade-in" aria-label="Mobile">
           <ul className="flex flex-col gap-1">
             {["Home", "Shop", "About", "Contact"].map(link => (
               <li key={link}>
                 <a
                   href={link === "Contact" || link === "About" ? undefined : link === "Home" ? "#categories" : `#${link.toLowerCase()}`}
-                  className="block px-3 py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  className="block px-3 py-3 sm:py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-foreground hover:bg-muted transition-colors cursor-pointer touch-target"
                   onClick={() => { if (link === "Contact") { setContactOpen(true); } if (link === "About") { setAboutOpen(true); } setMobileOpen(false); }}
                 >
                   {link}
@@ -111,7 +111,7 @@ const SiteHeader = () => {
             <li className="border-t border-border/50 mt-2 pt-2">
               <Link
                 to="/login"
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-primary hover:bg-muted transition-colors"
+                className="flex items-center gap-2 px-3 py-3 sm:py-2.5 rounded-lg text-muted-foreground font-semibold text-sm hover:text-primary hover:bg-muted transition-colors touch-target"
                 onClick={() => setMobileOpen(false)}
               >
                 <Lock className="w-4 h-4" />

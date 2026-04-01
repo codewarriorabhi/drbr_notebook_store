@@ -93,17 +93,17 @@ const HeroBanner = () => {
       {/* Arrows */}
       <button
         onClick={prev}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-background/40 backdrop-blur flex items-center justify-center text-foreground hover:bg-background/60 transition-colors"
+        className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-background/40 backdrop-blur flex items-center justify-center text-foreground hover:bg-background/60 transition-colors touch-target"
         aria-label="Previous slide"
       >
-        ‹
+        <span className="text-xl sm:text-2xl leading-none">‹</span>
       </button>
       <button
         onClick={next}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-background/40 backdrop-blur flex items-center justify-center text-foreground hover:bg-background/60 transition-colors"
+        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 sm:w-10 sm:h-10 rounded-full bg-background/40 backdrop-blur flex items-center justify-center text-foreground hover:bg-background/60 transition-colors touch-target"
         aria-label="Next slide"
       >
-        ›
+        <span className="text-xl sm:text-2xl leading-none">›</span>
       </button>
     </section>
   );
